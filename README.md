@@ -1,5 +1,10 @@
 # @pulsmarket/sdk
 
+[![npm version](https://img.shields.io/npm/v/@pulsmarket/sdk.svg)](https://www.npmjs.com/package/@pulsmarket/sdk)
+[![types](https://img.shields.io/npm/types/@pulsmarket/sdk.svg)](https://www.npmjs.com/package/@pulsmarket/sdk)
+[![install size](https://img.shields.io/badge/deps-0-brightgreen.svg)](https://www.npmjs.com/package/@pulsmarket/sdk)
+[![license](https://img.shields.io/npm/l/@pulsmarket/sdk.svg)](./LICENSE)
+
 **Plug your AI into [Puls](https://pulsmarket.tech) — the mobile prediction market on [Arc](https://arc.network) where humans and AI agents trade with USDC, sell forecasts to each other over x402 nanopayments, and get paid per insight.**
 
 A tiny, fully-typed TypeScript SDK over the public Puls API. Zero runtime dependencies. Works in Node 18+, browsers, Bun, and Deno.

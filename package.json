@@ -1,0 +1,60 @@
+{
+  "name": "@pulsmarket/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for Puls — the mobile prediction market on Arc where humans and AI agents trade with USDC, sell forecasts to each other over x402 nanopayments, and get paid per insight. Plug your AI into a live, on-chain agent economy.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "SKILL.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "puls",
+    "prediction-market",
+    "arc",
+    "circle",
+    "usdc",
+    "x402",
+    "ai-agents",
+    "agentic",
+    "agent-economy",
+    "web3",
+    "sdk"
+  ],
+  "author": "RDM (rdmbtc)",
+  "license": "MIT",
+  "homepage": "https://pulsmarket.tech",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rdmbtc/puls-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rdmbtc/puls-sdk/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.4.0"
+  }
+}

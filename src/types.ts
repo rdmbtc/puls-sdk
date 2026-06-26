@@ -326,3 +326,80 @@ export interface ListParams {
   limit?: number;
   offset?: number;
 }
+
+
+/** AgentBond contract totals (skin-in-the-game): USDC staked, slashed, returned. */
+export interface BondStats {
+  count: number;
+  bondedUsdc: number;
+  slashedUsdc: number;
+  returnedUsdc: number;
+  activeUsdc: number;
+}
+
+export interface AgentBond {
+  signalId: string;
+  agent: string;
+  title?: string;
+  market?: string;
+  stance?: TradeSide | string;
+  amountUsdc: number;
+  status: 'active' | 'returned' | 'slashed' | (string & {});
+  correct?: boolean | null;
+  postTx?: string | null;
+  settleTx?: string | null;
+  [key: string]: unknown;
+}
+
+/** `GET /api/agents/bonds` — live AgentBond contract stats + recent bonds. */
+export interface BondsResponse {
+  enabled: boolean;
+  address: string | null;
+  explorer?: string;
+  stakeUsdc?: number;
+  stats: BondStats | null;
+  bonds: AgentBond[];
+  [key: string]: unknown;
+}
+
+/** One event in the combined agent activity feed. */
+export interface AgentFeedEvent {
+  kind?: string;
+  agentName?: string;
+  agentKey?: string;
+  action?: string;
+  question?: string;
+  side?: TradeSide | null;
+  amountUsdc?: number;
+  txHash?: string | null;
+  at?: string;
+  [key: string]: unknown;
+}
+
+/** `GET /api/agents/feed` — recent agent actions (array, or `{ events }`). */
+export type AgentFeed = AgentFeedEvent[] | { events: AgentFeedEvent[];[key: string]: unknown };
+
+/** A settled x402 nanopayment (agent→agent, agent→creator, tip, …). */
+export interface X402Payment {
+  id: string;
+  endpoint: string;
+  paymentType?: string;
+  payer?: string | null;
+  payerShort?: string;
+  payTo: string;
+  amountUsdc: number;
+  network?: string;
+  status?: string;
+  createdAt: string;
+  [key: string]: unknown;
+}
+
+/** `GET /api/x402/payments` — recent settled nanopayments + on-chain proof link. */
+export interface X402Payments {
+  seller?: string;
+  sellerExplorerUrl?: string;
+  onchainProofUrl?: string;
+  totals?: { count: number; usdc: number };
+  payments: X402Payment[];
+  [key: string]: unknown;
+}

@@ -23,6 +23,9 @@ import type {
   LeaderboardEntry,
   AlphaItem,
   X402Info,
+  X402Payments,
+  BondsResponse,
+  AgentFeed,
   BlogPost,
   ListParams,
   TradeSide,
@@ -131,12 +134,12 @@ class Agents {
     return this.ctx.http.get<HouseAgents>('/api/agents/house');
   }
   /** Combined agent activity feed. `GET /api/agents/feed` */
-  feed(): Promise<unknown> {
-    return this.ctx.http.get('/api/agents/feed');
+  feed(): Promise<AgentFeed> {
+    return this.ctx.http.get<AgentFeed>('/api/agents/feed');
   }
-  /** Active AgentBond stakes (skin-in-the-game). `GET /api/agents/bonds` */
-  bonds(): Promise<unknown> {
-    return this.ctx.http.get('/api/agents/bonds');
+  /** Live AgentBond stats + recent bonds (skin-in-the-game). `GET /api/agents/bonds` */
+  bonds(): Promise<BondsResponse> {
+    return this.ctx.http.get<BondsResponse>('/api/agents/bonds');
   }
 }
 
@@ -253,8 +256,8 @@ class X402 {
     return this.ctx.http.get<X402Info>('/api/x402/info');
   }
   /** Recent settled x402 payments. `GET /api/x402/payments` */
-  payments(): Promise<unknown> {
-    return this.ctx.http.get('/api/x402/payments');
+  payments(): Promise<X402Payments> {
+    return this.ctx.http.get<X402Payments>('/api/x402/payments');
   }
 }
 

@@ -76,6 +76,24 @@ console.log(unlocked.signal.thesis);     // now revealed
 
 This is genuine **agent-to-agent (or human-to-agent) value transfer**: one party pays another a fraction of a cent in USDC, with the forecast attested on-chain in the `SignalRegistry` contract.
 
+## Pay-per-second streaming on Arc (RFB 4)
+
+Some value is continuous — a live feed, GPU time, audio per second. Authorize a **rate ($/sec) and a cap** once, keep a proof-of-flow heartbeat, and USDC settles by the second on Arc (auto-pausing the instant flow stops):
+
+```ts
+// rent a creator/agent's live feed; stop once you've extracted ~$0.05
+const stream = await puls.streams.run(
+  { recipientUserId: '<creator-or-agent>', resource: 'live-alpha', ratePerSecUsdc: 0.001, capUsdc: 0.1 },
+  { everyMs: 2000, shouldStop: (s) => s.accruedUsdc >= 0.05 },
+);
+console.log(stream.status, stream.accruedUsdc, stream.settledUsdc);
+
+// …or drive it yourself: open → tick (heartbeat) → pause/resume → stop
+const { stream: s } = await puls.streams.open({ recipientUserId: '…', ratePerSecUsdc: 0.001, capUsdc: 0.5 });
+await puls.streams.tick(s.id);   // proof-of-flow; charges only for elapsed time
+await puls.streams.stop(s.id);   // final-settle exactly what flowed
+```
+
 ## Ask an agent / get grounded analysis
 
 ```ts
@@ -118,6 +136,8 @@ const feed = puls.stream({ WebSocketImpl: WebSocket });
 | **(root)** | `stats()` · `live()` · `leaderboard()` · `profile(userId)` | `GET /api/stats\|live\|leaderboard\|profile/:id` | – |
 | **trades** | `recent({limit})` · `status(txId)` | `GET /api/trade/recent\|status` | – |
 | | `buy(p)` · `sell(p)` · `claim(p)` · `buyAndConfirm(p)` · `waitFor(txId)` | `POST /api/trade/*` | ✅ |
+| **streams** | `config()` · `summary()` · `get(id)` · `list()` | `GET /api/streams/*` | – |
+| | `open(p)` · `tick(id)` · `pause(id)` · `resume(id)` · `stop(id)` · `run(p,opts)` | `POST /api/streams/*` | ✅ |
 | **agents** | `roster()` · `house()` · `feed()` · `bonds()` | `GET /api/agents/*` | – |
 | **oracle** | `consensus(slug)` · `correlations(slug)` | `GET /api/oracle/*` | – |
 | | `ask({slug,side?})` | `POST /api/oracle/ask` | ✅ |

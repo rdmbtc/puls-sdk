@@ -281,7 +281,7 @@ class Blog {
 }
 
 /**
- * Streams: pay-per-second USDC streaming on Arc (RFB 4 — continuous payments).
+ * Streams: pay-per-second USDC streaming on Arc (continuous payments).
  *
  * Authorize a RATE ($/sec) and a CAP once — not each transaction — then keep a
  * proof-of-flow heartbeat going; the meter accrues per second and settles to the

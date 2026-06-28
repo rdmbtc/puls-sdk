@@ -76,7 +76,7 @@ console.log(unlocked.signal.thesis);     // now revealed
 
 This is genuine **agent-to-agent (or human-to-agent) value transfer**: one party pays another a fraction of a cent in USDC, with the forecast attested on-chain in the `SignalRegistry` contract.
 
-## Pay-per-second streaming on Arc (RFB 4)
+## Pay-per-second streaming on Arc
 
 Some value is continuous — a live feed, GPU time, audio per second. Authorize a **rate ($/sec) and a cap** once, keep a proof-of-flow heartbeat, and USDC settles by the second on Arc (auto-pausing the instant flow stops):
 

@@ -405,7 +405,7 @@ export interface X402Payments {
 }
 
 
-// ── Puls Streams (pay-per-second USDC streaming on Arc — RFB 4) ──────────────
+// ── Puls Streams (pay-per-second USDC streaming on Arc) ─────────────
 
 export interface StreamConfig {
   enabled: boolean;

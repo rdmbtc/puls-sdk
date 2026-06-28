@@ -1,4 +1,4 @@
-// Pay-per-second on Arc: rent a creator's live alpha feed by the second (RFB 4).
+// Pay-per-second on Arc: rent a creator's live alpha feed by the second.
 // One authorization (a rate + a cap), a proof-of-flow heartbeat, batched USDC
 // settlement — then tap stop. Needs a verified Puls identity.
 // Run: PULS_USER_ID=... PULS_TOKEN=... node examples/stream-alpha.mjs <recipientUserId>

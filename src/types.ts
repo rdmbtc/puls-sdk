@@ -403,3 +403,98 @@ export interface X402Payments {
   payments: X402Payment[];
   [key: string]: unknown;
 }
+
+
+// ── Puls Streams (pay-per-second USDC streaming on Arc — RFB 4) ──────────────
+
+export interface StreamConfig {
+  enabled: boolean;
+  /** Whether real on-chain USDC settlement is live (vs demo metering). */
+  live: boolean;
+  network: string;
+  asset: string;
+  settleThresholdUsdc: number;
+  staleSec: number;
+  maxRatePerSecUsdc: number;
+  maxCapUsdc: number;
+  model: string;
+  [key: string]: unknown;
+}
+
+export interface StreamSplitPart {
+  /** Recipient payout address (0x…). */
+  address?: string;
+  /** Or a Puls user id to resolve to a wallet address. */
+  toUserId?: string;
+  /** Share in basis points (sums to 10000 across all parts). */
+  bps: number;
+}
+
+export interface OpenStreamParams {
+  /** Recipient by Puls user id (resolved to a wallet address)… */
+  recipientUserId?: string;
+  /** …or by explicit payout address (0x…). */
+  recipientAddress?: string;
+  /** What is being streamed (e.g. "live-alpha:sage"). */
+  resource?: string;
+  /** Authorized spend rate, USDC per second (continuous authorization). */
+  ratePerSecUsdc: number;
+  /** Hard cap — the stream never spends more than this. */
+  capUsdc: number;
+  /** Optional live revenue split across multiple recipients. */
+  split?: StreamSplitPart[];
+  /** 'user' (default) or 'agent'. */
+  openedBy?: 'user' | 'agent';
+  meta?: Record<string, unknown>;
+  userId?: string;
+}
+
+export type StreamStatus = 'active' | 'paused' | 'stopped' | (string & {});
+
+/** A payment stream (public projection from the API). */
+export interface Stream {
+  id: string;
+  status: StreamStatus;
+  resource?: string | null;
+  ratePerSecUsdc: number;
+  capUsdc: number;
+  /** Total metered so far. */
+  accruedUsdc: number;
+  /** Total settled on-chain so far. */
+  settledUsdc: number;
+  /** Metered but not yet settled (awaiting the next batched settlement). */
+  pendingUsdc: number;
+  /** Remaining headroom under the cap. */
+  remainingUsdc: number;
+  payer: string;
+  recipient: string;
+  split?: StreamSplitPart[] | null;
+  openedBy?: 'user' | 'agent' | (string & {});
+  /** Whether real USDC settlement is live (vs demo metering). */
+  live?: boolean;
+  startedAt?: string;
+  lastTickAt?: string;
+  stoppedAt?: string | null;
+  settleTx?: string | null;
+  /** Set on a tick that hit the cap. */
+  capReached?: boolean;
+  [key: string]: unknown;
+}
+
+export interface StreamResult {
+  ok: boolean;
+  stream: Stream;
+}
+
+export interface StreamsList {
+  streams: Stream[];
+}
+
+export interface StreamSummary {
+  live: boolean;
+  totalStreams: number;
+  active: number;
+  streamedUsdc: number;
+  settledUsdc: number;
+  [key: string]: unknown;
+}

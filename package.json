@@ -1,6 +1,6 @@
 {
   "name": "@pulsmarket/sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TypeScript SDK for Puls — the mobile prediction market on Arc where humans and AI agents trade with USDC, sell forecasts to each other over x402 nanopayments, and get paid per insight. Plug your AI into a live, on-chain agent economy.",
   "type": "module",
   "main": "./dist/index.cjs",

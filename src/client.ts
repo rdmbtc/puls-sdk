@@ -29,6 +29,12 @@ import type {
   BlogPost,
   ListParams,
   TradeSide,
+  StreamConfig,
+  OpenStreamParams,
+  StreamResult,
+  Stream,
+  StreamsList,
+  StreamSummary,
 } from './types';
 
 const DEFAULT_BASE_URL = 'https://api.pulsmarket.tech';
@@ -275,6 +281,84 @@ class Blog {
 }
 
 /**
+ * Streams: pay-per-second USDC streaming on Arc (RFB 4 — continuous payments).
+ *
+ * Authorize a RATE ($/sec) and a CAP once — not each transaction — then keep a
+ * proof-of-flow heartbeat going; the meter accrues per second and settles to the
+ * recipient in batched on-chain USDC transfers. Pause, resume, or tap to stop.
+ */
+class Streams {
+  constructor(private ctx: Ctx) {}
+  /** Public streaming config (network, settle threshold, live flag). `GET /api/streams/config` */
+  config(): Promise<StreamConfig> {
+    return this.ctx.http.get<StreamConfig>('/api/streams/config');
+  }
+  /** Open a stream — authorize a rate ($/sec) + cap (auth). `POST /api/streams/open` */
+  open(params: OpenStreamParams): Promise<StreamResult> {
+    const userId = requireUser(this.ctx, params.userId);
+    return this.ctx.http.post<StreamResult>('/api/streams/open', { ...params, userId });
+  }
+  /** Get one stream's live state. `GET /api/streams/:id` */
+  get(id: string): Promise<{ stream: Stream }> {
+    return this.ctx.http.get<{ stream: Stream }>(`/api/streams/${encodeURIComponent(id)}`);
+  }
+  /** Your streams (as payer or recipient). `GET /api/streams?userId=` */
+  list(params: { userId?: string } = {}): Promise<StreamsList> {
+    return this.ctx.http.get<StreamsList>('/api/streams', { userId: params.userId ?? this.ctx.getUserId() });
+  }
+  /** Heartbeat / proof-of-flow — advance the meter by the time consumed (auth). `POST /api/streams/:id/tick` */
+  tick(id: string, params: { userId?: string } = {}): Promise<StreamResult> {
+    const userId = requireUser(this.ctx, params.userId);
+    return this.ctx.http.post<StreamResult>(`/api/streams/${encodeURIComponent(id)}/tick`, { userId });
+  }
+  /** Pause the meter (auth). `POST /api/streams/:id/pause` */
+  pause(id: string, params: { userId?: string } = {}): Promise<StreamResult> {
+    const userId = requireUser(this.ctx, params.userId);
+    return this.ctx.http.post<StreamResult>(`/api/streams/${encodeURIComponent(id)}/pause`, { userId });
+  }
+  /** Resume a paused stream (auth). `POST /api/streams/:id/resume` */
+  resume(id: string, params: { userId?: string } = {}): Promise<StreamResult> {
+    const userId = requireUser(this.ctx, params.userId);
+    return this.ctx.http.post<StreamResult>(`/api/streams/${encodeURIComponent(id)}/resume`, { userId });
+  }
+  /** Stop the stream — final settle of exactly what flowed (auth). `POST /api/streams/:id/stop` */
+  stop(id: string, params: { userId?: string } = {}): Promise<StreamResult> {
+    const userId = requireUser(this.ctx, params.userId);
+    return this.ctx.http.post<StreamResult>(`/api/streams/${encodeURIComponent(id)}/stop`, { userId });
+  }
+  /** Network-wide streaming totals. `GET /api/streams/stats/summary` */
+  summary(): Promise<StreamSummary> {
+    return this.ctx.http.get<StreamSummary>('/api/streams/stats/summary');
+  }
+  /**
+   * Open a stream and keep a proof-of-flow heartbeat going until `shouldStop`
+   * fires (or the cap is hit), then stop + final-settle. Returns the final state.
+   *
+   * @example
+   * const s = await puls.streams.run(
+   *   { recipientUserId: sageId, resource: 'live-alpha', ratePerSecUsdc: 0.001, capUsdc: 0.2 },
+   *   { everyMs: 2000, shouldStop: (s) => s.accruedUsdc >= 0.1 },
+   * );
+   */
+  async run(
+    params: OpenStreamParams,
+    opts: { everyMs?: number; maxTicks?: number; shouldStop?: (s: Stream) => boolean } = {},
+  ): Promise<Stream> {
+    const everyMs = opts.everyMs ?? 2000;
+    const maxTicks = opts.maxTicks ?? 60;
+    const { stream } = await this.open(params);
+    let cur: Stream = stream;
+    for (let i = 0; i < maxTicks; i++) {
+      await new Promise((r) => setTimeout(r, everyMs));
+      cur = (await this.tick(cur.id, { userId: params.userId })).stream;
+      if (cur.status !== 'active' || cur.remainingUsdc <= 0) break;
+      if (opts.shouldStop && opts.shouldStop(cur)) break;
+    }
+    return (await this.stop(cur.id, { userId: params.userId })).stream;
+  }
+}
+
+/**
  * The Puls SDK client.
  *
  * @example
@@ -302,6 +386,7 @@ export class PulsClient {
   readonly alpha: Alpha;
   readonly x402: X402;
   readonly blog: Blog;
+  readonly streams: Streams;
 
   constructor(options: PulsClientOptions = {}) {
     const fetchImpl = options.fetch ?? (globalThis as { fetch?: typeof fetch }).fetch;
@@ -330,6 +415,7 @@ export class PulsClient {
     this.alpha = new Alpha(ctx);
     this.x402 = new X402(ctx);
     this.blog = new Blog(ctx);
+    this.streams = new Streams(ctx);
   }
 
   /** Set/replace the verified identity (userId + Supabase JWT) used for authed actions. */

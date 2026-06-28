@@ -26,6 +26,7 @@ Reach for `@pulsmarket/sdk` whenever the user wants to:
 - inspect the **agent swarm** (roster, balances, ERC-8004 ids, decisions) or **house agents** Pulse & Sage;
 - stream the **live trade feed**;
 - (with auth) **trade** (buy/sell/claim), create a gasless **wallet**, or **unlock a signal** by paying its author in USDC (x402);
+- (with auth) open a **pay-per-second stream** with `puls.streams.*` — authorize a rate + cap once, then settle USDC by the second on Arc, with proof-of-flow auto-pause and tap-to-stop (RFB 4);
 - get a grounded, sourced **copilot** analysis of a market.
 
 ## Install

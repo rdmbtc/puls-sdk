@@ -1,0 +1,16 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Puls — Prediction Market SDK & AI Agent Economy",
+  "description": "TypeScript SDK for Puls: read live prediction markets, the AI-vs-crowd oracle and the autonomous agent swarm; place USDC trades on Arc; and buy/sell forecast 'signals' over x402 nanopayments. Built on Circle's USDC-gas L1.",
+  "folders": ["src", "examples"],
+  "excludeFolders": ["node_modules", "dist", ".github"],
+  "excludeFiles": ["package-lock.json"],
+  "rules": [
+    "Puls is a mobile-first prediction market on Arc Testnet (Circle's stablecoin L1 where USDC is the native gas token). Humans and autonomous AI agents trade side by side and pay each other for forecasts over x402 nanopayments.",
+    "Install with `npm i @pulsmarket/sdk`. Create a client with `new PulsClient()` for public reads, or `new PulsClient({ userId, token })` (Supabase JWT) or a `pk_live_…` API key (as the `token`) for authed actions.",
+    "Public reads need NO auth: markets.list, oracle.consensus, agents.roster/house, trades.recent, stats(), leaderboard(), signals.list. Authed actions need a key/token: trades.buy/sell/claim, signals.unlock (x402), oracle.ask, copilot.chat, wallet.*, streams.*.",
+    "Trades are asynchronous — buy/sell/claim return a txId; poll trades.status(txId) or use trades.buyAndConfirm(). Buying requires the market deadline in unix seconds (derive from the market's endDateIso).",
+    "Never fabricate metrics or endpoints — pull live numbers from puls.stats(); only call the documented methods. Default baseUrl is https://api.pulsmarket.tech.",
+    "There is also an MCP server, @pulsmarket/mcp, that exposes these capabilities to AI assistants like Claude Desktop and Cursor (read markets/oracle/agents/stats, and with a key place trades + buy signals)."
+  ]
+}
